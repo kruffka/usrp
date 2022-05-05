@@ -21,6 +21,14 @@ common_lib.h
 /home/novosibirsk/rx_tx_test/common_lib.h
 xmmintrin.h
 -
+boost/lexical_cast.hpp
+-
+boost/algorithm/string.hpp
+-
+boost/thread.hpp
+-
+boost/format.hpp
+-
 uhd/utils/safe_main.hpp
 -
 boost/algorithm/string.hpp

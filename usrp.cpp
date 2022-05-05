@@ -5,6 +5,11 @@
 #include "common_lib.h"
 #include <xmmintrin.h>
 
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/thread.hpp>
+#include <boost/format.hpp>
+
 
 // uhd safe main
 #include <uhd/utils/safe_main.hpp>
@@ -252,6 +257,10 @@ static int trx_usrp_write(openair0_device *device,
 static int trx_usrp_read(openair0_device *device, openair0_timestamp *ptimestamp, void **buff, int nsamps, int cc) {
    usrp_state_t *s = (usrp_state_t *)device->priv;
 
+      uhd::stream_args_t stream_args("sc16", "sc16");
+    // stream_args.channels             = 1;
+    uhd::rx_streamer::sptr rx_stream = s->usrp->get_rx_stream(stream_args);
+
   int samples_received=0;
   int nsamps2;  // aligned to upper 32 or 16 byte boundary
 #if defined(__x86_64) || defined(__i386__)
@@ -391,9 +400,19 @@ int UHD_SAFE_MAIN(int argc, char* argv[])
       LOG_E(HW,"More than one USRP Device Found. Please specify device more precisely in config file.\n");
       free(s);
       return -1;
-    } else {
-        LOG_I(HW,"USRP Device Found.\n");
-        std::cout << args << std::endl;
+    }
+    
+    LOG_I(HW,"Found USRP %s\n", device_adds[0].get("type").c_str());
+    double usrp_master_clock;
+
+    if (device_adds[0].get("type") == "n3xx") {
+      printf("Found USRP n300\n");
+      device->type=USRP_N300_DEV;
+      usrp_master_clock = 122.88e6;
+      args += boost::str(boost::format(",master_clock_rate=%f") % usrp_master_clock);
+      //args += ", send_buff_size=33554432";
+      // *****************
+      args += ",num_send_frames=1024,num_recv_frames=1024,send_frame_size=7696,recv_frame_size=7696";
     }
 
     if ( device->priv == NULL) {
@@ -404,6 +423,7 @@ int UHD_SAFE_MAIN(int argc, char* argv[])
       LOG_E(HW, "multiple device init detected\n");
       return 0;
     }
+
 
     // setup the program options
     po::options_description desc("Allowed options");
@@ -452,13 +472,14 @@ int UHD_SAFE_MAIN(int argc, char* argv[])
     }
 
     // create a usrp device
-    std::cout << std::endl;
-    std::cout << boost::format("Creating the transmit usrp device with: %s...") % tx_args
-              << std::endl;
-    s->usrp = uhd::usrp::multi_usrp::make(tx_args);
-    std::cout << std::endl;
-    // std::cout << boost::format("Creating the receive usrp device with: %s...") % rx_args
+    // std::cout << std::endl;
+    // std::cout << boost::format("Creating the transmit usrp device with: %s...") % tx_args
     //           << std::endl;
+    // s->usrp = uhd::usrp::multi_usrp::make(tx_args);
+    // std::cout << std::endl;
+    std::cout << boost::format("Creating the receive usrp device with: %s...") % rx_args
+              << std::endl;
+    s->usrp = uhd::usrp::multi_usrp::make(rx_args);
     // uhd::usrp::multi_usrp::sptr rx_usrp = uhd::usrp::multi_usrp::make(rx_args);
 
     // always select the subdevice first, the channel mapping affects the other settings
@@ -647,10 +668,9 @@ int UHD_SAFE_MAIN(int argc, char* argv[])
 
     // create a transmit streamer
     // linearly map channels (index0 = channel0, index1 = channel1, ...)
-    uhd::stream_args_t stream_args("sc16", otw);
-    stream_args.channels             = tx_channel_nums;
-    // uhd::tx_streamer::sptr tx_stream = s->usrp->get_tx_stream(stream_args);
-    s->rx_stream = s->usrp->get_rx_stream(stream_args);
+    // uhd::stream_args_t stream_args("sc16", otw);
+    // stream_args.channels             = tx_channel_nums;
+    // s->rx_stream = s->usrp->get_rx_stream(stream_args);
 
     // allocate a buffer which we re-use for each channel
     // if (spb == 0)
@@ -746,6 +766,27 @@ int UHD_SAFE_MAIN(int argc, char* argv[])
                 // recv_to_file<std::complex<short>>(
         //     rx_usrp, "sc16", otw, rx_file, spb, total_num_samps, settling, rx_channel_nums);
 
+
+         sleep(1);
+        // create tx & rx streamer
+        uhd::stream_args_t stream_args_rx("sc16", "sc16");
+        int samples=30720000;
+        int max=s->usrp->get_rx_stream(stream_args_rx)->get_max_num_samps();
+        samples/=10000;
+        LOG_I(HW,"RF board max packet size %u, size for 100µs jitter %d \n", max, samples);
+          if ( samples < max ) {
+    stream_args_rx.args["spp"] = str(boost::format("%d") % samples );
+  }
+
+  LOG_I(HW,"rx_max_num_samps %zu\n",
+        s->usrp->get_rx_stream(stream_args_rx)->get_max_num_samps());
+    int choffset = 0;
+  for (int i = 0; i<1; i++) {
+    LOG_I(HW,"setting rx channel %d\n",i+choffset);
+    stream_args_rx.channels.push_back(i+choffset);
+  }
+
+        
         openair0_timestamp timestamp;
         int cc = 1;
         void *rxp[cc];
@@ -756,7 +797,7 @@ int UHD_SAFE_MAIN(int argc, char* argv[])
         int slot_nr = 0;
         int absolute_slot = 0;
         
-        int recv_samps= 30720;
+        int recv_samps = 30720;
 
         device->type = USRP_N300_DEV;
 
@@ -766,6 +807,9 @@ int UHD_SAFE_MAIN(int argc, char* argv[])
                 rxp[i] = (void *)&rxdata[slot_nr*30720];
             }
             
+            if (absolute_slot % 256 == 0)
+                LOG_I(PHY, "absolute_slot = %d slot_nr %d\n", absolute_slot, slot_nr);
+            
             recv_samps = trx_usrp_read(device, &timestamp, (void **)rxp, nsamps, cc);
             //openair0_device *device, openair0_timestamp *ptimestamp, void **buff, int nsamps, int cc
             AssertFatal(nsamps == recv_samps, "30720 != nsamps");
@@ -773,9 +817,7 @@ int UHD_SAFE_MAIN(int argc, char* argv[])
             // trx_usrp_write();
             slot_nr == nb_slot_frame ? 0 : slot_nr++;
             absolute_slot++;
-            if (absolute_slot % 256 == 0)
-                LOG_I(PHY, "absolute_slot = %d slot_nr %d\n", absolute_slot, slot_nr);
-            
+         
         }
 
     } else {
