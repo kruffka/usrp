@@ -1,0 +1,55 @@
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/novosibirsk/rx_tx_test/init_usrp/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_05f4f/fast"
+/usr/bin/make -f CMakeFiles/cmTC_05f4f.dir/build.make CMakeFiles/cmTC_05f4f.dir/build
+make[1]: Entering directory '/home/novosibirsk/rx_tx_test/init_usrp/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_05f4f.dir/CheckSymbolExists.cxx.o
+/usr/bin/c++     -o CMakeFiles/cmTC_05f4f.dir/CheckSymbolExists.cxx.o -c /home/novosibirsk/rx_tx_test/init_usrp/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx
+Linking CXX executable cmTC_05f4f
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_05f4f.dir/link.txt --verbose=1
+/usr/bin/c++       CMakeFiles/cmTC_05f4f.dir/CheckSymbolExists.cxx.o  -o cmTC_05f4f 
+CMakeFiles/cmTC_05f4f.dir/CheckSymbolExists.cxx.o: In function `main':
+CheckSymbolExists.cxx:(.text+0x1b): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_05f4f.dir/build.make:97: recipe for target 'cmTC_05f4f' failed
+make[1]: *** [cmTC_05f4f] Error 1
+make[1]: Leaving directory '/home/novosibirsk/rx_tx_test/init_usrp/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_05f4f/fast' failed
+make: *** [cmTC_05f4f/fast] Error 2
+
+File /home/novosibirsk/rx_tx_test/init_usrp/build/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/novosibirsk/rx_tx_test/init_usrp/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_3ec64/fast"
+/usr/bin/make -f CMakeFiles/cmTC_3ec64.dir/build.make CMakeFiles/cmTC_3ec64.dir/build
+make[1]: Entering directory '/home/novosibirsk/rx_tx_test/init_usrp/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_3ec64.dir/CheckFunctionExists.cxx.o
+/usr/bin/c++    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_3ec64.dir/CheckFunctionExists.cxx.o -c /home/novosibirsk/rx_tx_test/init_usrp/build/CMakeFiles/CheckLibraryExists/CheckFunctionExists.cxx
+Linking CXX executable cmTC_3ec64
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3ec64.dir/link.txt --verbose=1
+/usr/bin/c++   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_3ec64.dir/CheckFunctionExists.cxx.o  -o cmTC_3ec64 -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_3ec64.dir/build.make:97: recipe for target 'cmTC_3ec64' failed
+make[1]: *** [cmTC_3ec64] Error 1
+make[1]: Leaving directory '/home/novosibirsk/rx_tx_test/init_usrp/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_3ec64/fast' failed
+make: *** [cmTC_3ec64/fast] Error 2
+
+

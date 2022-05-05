@@ -1,0 +1,3 @@
+/home/novosibirsk/rx_tx_test/init_usrp/build/CMakeFiles/rebuild_cache.dir
+/home/novosibirsk/rx_tx_test/init_usrp/build/CMakeFiles/init_usrp.dir
+/home/novosibirsk/rx_tx_test/init_usrp/build/CMakeFiles/edit_cache.dir
