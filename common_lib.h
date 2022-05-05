@@ -44,7 +44,107 @@ typedef enum {
   MAX_RF_DEV_TYPE
 } dev_type_t;
 
+/*! \brief Clock source types */
+typedef enum {
+  //! this means the paramter has not been set
+  unset=-1,
+  //! This tells the underlying hardware to use the internal reference
+  internal=0,
+  //! This tells the underlying hardware to use the external reference
+  external=1,
+  //! This tells the underlying hardware to use the gpsdo reference
+  gpsdo=2
+} clock_source_t;
+
 typedef long openair0_timestamp;
+
+/*! \brief RF frontend parameters set by application */
+typedef struct {
+  //! Module ID for this configuration
+  int Mod_id;
+  //! device log level
+  int log_level;
+  //! duplexing mode
+  // duplex_mode_t duplex_mode;
+  //! number of downlink resource blocks
+  int num_rb_dl;
+  //! number of samples per frame
+  unsigned int  samples_per_frame;
+  //! the sample rate for both transmit and receive.
+  double sample_rate;
+  //! flag to indicate that the device is doing mmapped DMA transfers
+  int mmapped_dma;
+  //! offset in samples between TX and RX paths
+  int tx_sample_advance;
+  //! samples per packet on the fronthaul interface
+  int samples_per_packet;
+  //! number of RX channels (=RX antennas)
+  int rx_num_channels;
+  //! number of TX channels (=TX antennas)
+  int tx_num_channels;
+  //! \brief RX base addresses for mmapped_dma
+  int32_t *rxbase[4];
+  //! \brief TX base addresses for mmapped_dma
+  int32_t *txbase[4];
+  //! \brief Center frequency in Hz for RX.
+  //! index: [0..rx_num_channels[
+  double rx_freq[4];
+  //! \brief Center frequency in Hz for TX.
+  //! index: [0..rx_num_channels[ !!! see lte-ue.c:427 FIXME iterates over rx_num_channels
+  double tx_freq[4];
+  //! \brief memory
+  //! \brief Pointer to Calibration table for RX gains
+  // rx_gain_calib_table_t *rx_gain_calib_table;
+  //! mode for rxgain (ExpressMIMO2)
+  // rx_gain_t rxg_mode[4];
+  //! \brief Gain for RX in dB.
+  //! index: [0..rx_num_channels]
+  double rx_gain[4];
+  //! \brief Gain offset (for calibration) in dB
+  //! index: [0..rx_num_channels]
+  double rx_gain_offset[4];
+  //! gain for TX in dB
+  double tx_gain[4];
+  //! RX bandwidth in Hz
+  double rx_bw;
+  //! TX bandwidth in Hz
+  double tx_bw;
+  //! clock source
+  clock_source_t clock_source;
+  //! timing_source
+  clock_source_t time_source;
+  //! Manual SDR IP address
+  //#if defined(EXMIMO) || defined(OAI_USRP) || defined(OAI_BLADERF) || defined(OAI_LMSSDR)
+  char *sdr_addrs;
+  //! Auto calibration flag
+  int autocal[4];
+  //! rf devices work with x bits iqs when oai have its own iq format
+  //! the two following parameters are used to convert iqs
+  int iq_txshift;
+  int iq_rxrescale;
+  //! Configuration file for LMS7002M
+  char *configFilename;
+  //! remote IP/MAC addr for Ethernet interface
+  char *remote_addr;
+  //! remote port number for Ethernet interface
+  unsigned int remote_port;
+  //! local IP/MAC addr for Ethernet interface (eNB/BBU, UE)
+  char *my_addr;
+  //! local port number for Ethernet interface (eNB/BBU, UE)
+  unsigned int my_port;
+  //! record player configuration, definition in record_player.h
+  uint32_t       recplay_mode;
+  // recplay_conf_t *recplay_conf;
+  //! number of samples per tti
+  unsigned int  samples_per_tti;
+  //! the sample rate for receive.
+  double rx_sample_rate;
+  //! the sample rate for transmit.
+  double tx_sample_rate;
+  //! check for threequarter sampling rate
+  int8_t threequarter_fs;
+} openair0_config_t;
+
 
 /*!\brief structure holds the parameters to configure USRP devices*/
 typedef struct openair0_device_t openair0_device;
@@ -52,7 +152,7 @@ typedef struct openair0_device_t openair0_device;
 /*!\brief structure holds the parameters to configure USRP devices */
 struct openair0_device_t {
     /*!tx write thread*/
-    openair0_thread_t write_thread;
+    // openair0_thread_t write_thread;
 
     /*!brief Module ID of this device */
     int Mod_id;
@@ -64,18 +164,18 @@ struct openair0_device_t {
     dev_type_t type;
 
     /*!brief Transport protocol type that the device supports (in case I/Q samples need to be transported) */
-    transport_type_t transp_type;
+    // transport_type_t transp_type;
 
     /*!brief Type of the device's host (RAU/RRU) */
-    host_type_t host_type;
+    // host_type_t host_type;
 
     /* !brief RF frontend parameters set by application */
     openair0_config_t *openair0_cfg;
 
     /* !brief ETH params set by application */
-    eth_params_t *eth_params;
+    // eth_params_t *eth_params;
     //! record player data, definition in record_player.h
-    recplay_state_t *recplay_state;
+    // recplay_state_t *recplay_state;
     /* !brief Indicates if device already initialized */
     int is_init;
 
@@ -241,101 +341,3 @@ struct openair0_device_t {
     void *(*get_internal_parameter)(char *id);
 };
 
-/*! \brief Clock source types */
-typedef enum {
-  //! this means the paramter has not been set
-  unset=-1,
-  //! This tells the underlying hardware to use the internal reference
-  internal=0,
-  //! This tells the underlying hardware to use the external reference
-  external=1,
-  //! This tells the underlying hardware to use the gpsdo reference
-  gpsdo=2
-} clock_source_t;
-
-/*! \brief RF frontend parameters set by application */
-typedef struct {
-  //! Module ID for this configuration
-  int Mod_id;
-  //! device log level
-  int log_level;
-  //! duplexing mode
-  duplex_mode_t duplex_mode;
-  //! number of downlink resource blocks
-  int num_rb_dl;
-  //! number of samples per frame
-  unsigned int  samples_per_frame;
-  //! the sample rate for both transmit and receive.
-  double sample_rate;
-  //! flag to indicate that the device is doing mmapped DMA transfers
-  int mmapped_dma;
-  //! offset in samples between TX and RX paths
-  int tx_sample_advance;
-  //! samples per packet on the fronthaul interface
-  int samples_per_packet;
-  //! number of RX channels (=RX antennas)
-  int rx_num_channels;
-  //! number of TX channels (=TX antennas)
-  int tx_num_channels;
-  //! \brief RX base addresses for mmapped_dma
-  int32_t *rxbase[4];
-  //! \brief TX base addresses for mmapped_dma
-  int32_t *txbase[4];
-  //! \brief Center frequency in Hz for RX.
-  //! index: [0..rx_num_channels[
-  double rx_freq[4];
-  //! \brief Center frequency in Hz for TX.
-  //! index: [0..rx_num_channels[ !!! see lte-ue.c:427 FIXME iterates over rx_num_channels
-  double tx_freq[4];
-  //! \brief memory
-  //! \brief Pointer to Calibration table for RX gains
-  rx_gain_calib_table_t *rx_gain_calib_table;
-  //! mode for rxgain (ExpressMIMO2)
-  rx_gain_t rxg_mode[4];
-  //! \brief Gain for RX in dB.
-  //! index: [0..rx_num_channels]
-  double rx_gain[4];
-  //! \brief Gain offset (for calibration) in dB
-  //! index: [0..rx_num_channels]
-  double rx_gain_offset[4];
-  //! gain for TX in dB
-  double tx_gain[4];
-  //! RX bandwidth in Hz
-  double rx_bw;
-  //! TX bandwidth in Hz
-  double tx_bw;
-  //! clock source
-  clock_source_t clock_source;
-  //! timing_source
-  clock_source_t time_source;
-  //! Manual SDR IP address
-  //#if defined(EXMIMO) || defined(OAI_USRP) || defined(OAI_BLADERF) || defined(OAI_LMSSDR)
-  char *sdr_addrs;
-  //! Auto calibration flag
-  int autocal[4];
-  //! rf devices work with x bits iqs when oai have its own iq format
-  //! the two following parameters are used to convert iqs
-  int iq_txshift;
-  int iq_rxrescale;
-  //! Configuration file for LMS7002M
-  char *configFilename;
-  //! remote IP/MAC addr for Ethernet interface
-  char *remote_addr;
-  //! remote port number for Ethernet interface
-  unsigned int remote_port;
-  //! local IP/MAC addr for Ethernet interface (eNB/BBU, UE)
-  char *my_addr;
-  //! local port number for Ethernet interface (eNB/BBU, UE)
-  unsigned int my_port;
-  //! record player configuration, definition in record_player.h
-  uint32_t       recplay_mode;
-  recplay_conf_t *recplay_conf;
-  //! number of samples per tti
-  unsigned int  samples_per_tti;
-  //! the sample rate for receive.
-  double rx_sample_rate;
-  //! the sample rate for transmit.
-  double tx_sample_rate;
-  //! check for threequarter sampling rate
-  int8_t threequarter_fs;
-} openair0_config_t;

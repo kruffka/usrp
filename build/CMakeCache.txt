@@ -160,7 +160,7 @@ CMAKE_OBJCOPY:FILEPATH=/usr/bin/objcopy
 CMAKE_OBJDUMP:FILEPATH=/usr/bin/objdump
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=tx_rx_usrp
+CMAKE_PROJECT_NAME:STATIC=usrp
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/usr/bin/ranlib
@@ -237,6 +237,12 @@ tx_rx_usrp_BINARY_DIR:STATIC=/home/novosibirsk/rx_tx_test/build
 
 //Value Computed by CMake
 tx_rx_usrp_SOURCE_DIR:STATIC=/home/novosibirsk/rx_tx_test
+
+//Value Computed by CMake
+usrp_BINARY_DIR:STATIC=/home/novosibirsk/rx_tx_test/build
+
+//Value Computed by CMake
+usrp_SOURCE_DIR:STATIC=/home/novosibirsk/rx_tx_test
 
 
 ########################

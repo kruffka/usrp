@@ -111,44 +111,44 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named tx_rx_usrp
+# Target rules for targets named usrp
 
 # Build rule for target.
-tx_rx_usrp: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 tx_rx_usrp
-.PHONY : tx_rx_usrp
+usrp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 usrp
+.PHONY : usrp
 
 # fast build rule for target.
-tx_rx_usrp/fast:
-	$(MAKE) -f CMakeFiles/tx_rx_usrp.dir/build.make CMakeFiles/tx_rx_usrp.dir/build
-.PHONY : tx_rx_usrp/fast
+usrp/fast:
+	$(MAKE) -f CMakeFiles/usrp.dir/build.make CMakeFiles/usrp.dir/build
+.PHONY : usrp/fast
 
-txrx_loopback_to_file.o: txrx_loopback_to_file.cpp.o
+usrp.o: usrp.cpp.o
 
-.PHONY : txrx_loopback_to_file.o
+.PHONY : usrp.o
 
 # target to build an object file
-txrx_loopback_to_file.cpp.o:
-	$(MAKE) -f CMakeFiles/tx_rx_usrp.dir/build.make CMakeFiles/tx_rx_usrp.dir/txrx_loopback_to_file.cpp.o
-.PHONY : txrx_loopback_to_file.cpp.o
+usrp.cpp.o:
+	$(MAKE) -f CMakeFiles/usrp.dir/build.make CMakeFiles/usrp.dir/usrp.cpp.o
+.PHONY : usrp.cpp.o
 
-txrx_loopback_to_file.i: txrx_loopback_to_file.cpp.i
+usrp.i: usrp.cpp.i
 
-.PHONY : txrx_loopback_to_file.i
+.PHONY : usrp.i
 
 # target to preprocess a source file
-txrx_loopback_to_file.cpp.i:
-	$(MAKE) -f CMakeFiles/tx_rx_usrp.dir/build.make CMakeFiles/tx_rx_usrp.dir/txrx_loopback_to_file.cpp.i
-.PHONY : txrx_loopback_to_file.cpp.i
+usrp.cpp.i:
+	$(MAKE) -f CMakeFiles/usrp.dir/build.make CMakeFiles/usrp.dir/usrp.cpp.i
+.PHONY : usrp.cpp.i
 
-txrx_loopback_to_file.s: txrx_loopback_to_file.cpp.s
+usrp.s: usrp.cpp.s
 
-.PHONY : txrx_loopback_to_file.s
+.PHONY : usrp.s
 
 # target to generate assembly for a file
-txrx_loopback_to_file.cpp.s:
-	$(MAKE) -f CMakeFiles/tx_rx_usrp.dir/build.make CMakeFiles/tx_rx_usrp.dir/txrx_loopback_to_file.cpp.s
-.PHONY : txrx_loopback_to_file.cpp.s
+usrp.cpp.s:
+	$(MAKE) -f CMakeFiles/usrp.dir/build.make CMakeFiles/usrp.dir/usrp.cpp.s
+.PHONY : usrp.cpp.s
 
 # Help Target
 help:
@@ -158,10 +158,10 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... tx_rx_usrp"
-	@echo "... txrx_loopback_to_file.o"
-	@echo "... txrx_loopback_to_file.i"
-	@echo "... txrx_loopback_to_file.s"
+	@echo "... usrp"
+	@echo "... usrp.o"
+	@echo "... usrp.i"
+	@echo "... usrp.s"
 .PHONY : help
 
 

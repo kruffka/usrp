@@ -6,7 +6,7 @@
 #
 
 cmake_minimum_required(VERSION 3.5.1)
-project(tx_rx_usrp CXX)
+project(usrp CXX)
 
 ### Configure Compiler ########################################################
 set(CMAKE_CXX_STANDARD 11)
@@ -46,7 +46,7 @@ include_directories(
 link_directories(${Boost_LIBRARY_DIRS})
 
 ### Make the executable #######################################################
-add_executable(tx_rx_usrp txrx_loopback_to_file.cpp)
+add_executable(${PROJECT_NAME} usrp.cpp)
 
 set(CMAKE_BUILD_TYPE "Release")
 message(STATUS "******************************************************************************")
@@ -60,12 +60,12 @@ message(STATUS "****************************************************************
 # anything else we need (in this case, some Boost libraries):
 if(NOT UHD_USE_STATIC_LIBS)
     message(STATUS "Linking against shared UHD library.")
-    target_link_libraries(tx_rx_usrp ${UHD_LIBRARIES} ${Boost_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME} ${UHD_LIBRARIES} ${Boost_LIBRARIES})
 # Shared library case: All we need to do is link against the library, and
 # anything else we need (in this case, some Boost libraries):
 else(NOT UHD_USE_STATIC_LIBS)
     message(STATUS "Linking against static UHD library.")
-    target_link_libraries(tx_rx_usrp
+    target_link_libraries(${PROJECT_NAME}
         # We could use ${UHD_LIBRARIES}, but linking requires some extra flags,
         # so we use this convenience variable provided to us
         ${UHD_STATIC_LIB_LINK_FLAG}
@@ -80,5 +80,5 @@ endif(NOT UHD_USE_STATIC_LIBS)
 # We will skip these in this example.
 
 find_package(Boost COMPONENTS system filesystem REQUIRED)
-target_link_libraries(tx_rx_usrp ${Boost_FILESYSTEM_LIBRARY})
+target_link_libraries(${PROJECT_NAME} ${Boost_FILESYSTEM_LIBRARY})
 # target_link_libraries(tx_rx_usrp ${Boost_SYSTEM_LIBRARY})
